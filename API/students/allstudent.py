@@ -100,7 +100,7 @@ class Calc_Gpa(Resource):
     def post(self, student_id):
         scores= Score.query.filter_by(student_id=student_id).all()
         a = scores.score
-        print (a)
+        print ()
         grade=[]
         points=[]
         for score in a:
