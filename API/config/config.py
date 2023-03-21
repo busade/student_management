@@ -28,10 +28,11 @@ class DevConfig:
 class TestConfig(Config):
     pass
 class ProdConfig(Config):
-    # SQLALCHEMY_TRACK_MODIFICATIONS = False
-    # DEBUG = config('DEBUG', False, cast=bool)
-    # SQLALCHEMY_DATABASE_URI = uri
-    pass
+    SQLALCHEMY_DATABASE_URI = uri
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    DEBUG = config('DEBUG', False, cast=bool)
+    SQLALCHEMY_DATABASE_URI = uri
+    
 
 config_dict = {
     'dev': DevConfig,
