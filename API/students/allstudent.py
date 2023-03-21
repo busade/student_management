@@ -6,6 +6,7 @@ from flask_jwt_extended import jwt_required
 from http import HTTPStatus
 from ..utils import db
 from ..course.courses import score_model
+from ..utils.grades import Getgrade
 
 student_namespace = Namespace('student', description='namesapce for students')
  
@@ -79,73 +80,41 @@ class GetUpdateDelete(Resource):
 
         return {'message': 'student deleted successfully'}
 
-@student_namespace.route('/<int:student_id>/scores')
-class GetStudentScores(Resource):
-    @student_namespace.marshal_with(score_model)
-    def get(self,student_id):
 
-        scores = Score.query.filter_by(student_id=student_id).all()
-        
-        
-        if scores:
-            return scores, HTTPStatus.OK
-        return{'message':'No scores yet'}, HTTPStatus.FORBIDDEN
-    
+@student_namespace.route('/<int:student_id>/score')
+class GetScore(Resource):
 
+    @student_namespace.marshal_list_with(score_model)
+    def get(self, student_id):
+        score = Score.query.filter_by(student_id=student_id).all()
+        print (score)
 
+        return score, HTTPStatus.OK
 
 @student_namespace.route('/<int:student_id>/gpa')
 class Calc_Gpa(Resource):
     @student_namespace.marshal_with(score_model)
     def post(self, student_id):
-        scores= Score.query.filter_by(student_id=student_id).all()
-        a = scores.score
-        print ()
+        courses= Score.query.filter_by(student_id=student_id).all()
+        a=courses.score
         grade=[]
         points=[]
         for score in a:
-            # s = list(score)
-            grade.append(score)
-            if grade>= 85:
-                points.append(4.0)
-            elif grade>=70:
-                points.append(3.0)
-            elif grade>= 60:
-                points.append(2.0)
-            elif grade>= 45:
-                points.append(1.0)
-            elif grade < 45:
-                points.append(0.0)
-            elif grade is None:
-                points.append(0.0)
-        
-        grade_point = []
-        total_grade_point =0.0
-        course_ids = scores.course_id
-        courses=[]
-        unit =[]
-        for c in course_ids:
-            credit_hr = Course.get_by_id(c)
-            courses.append(credit_hr.course_weight)
-        total_credit_hrs=0.0
-        for w in courses:
-            total_credit_hrs+=w
-            unit.append(w)
-        for point in points:
-            cal = point* unit
-            grade_point.append(cal)
+            w= Getgrade(score)
+            grade.append(w)
+            
+      
+        course= Course.get_by_id(course_id = courses.course_id)
+        credit_hr= course.course_weight
+        unit=[]
+        for  weight in credit_hr:
+            y = weight
+            unit.append(y)
+
+        grade_point = grade*unit
 
 
-        for grade in grade_point:
-            total_grade_point+=grade
-
-        cgpa = total_grade_point/total_credit_hrs if  total_credit_hrs > 0 else 0
-
-
-        return {'cgpa': cgpa}, HTTPStatus.OK
 
 
         
-        
-
         

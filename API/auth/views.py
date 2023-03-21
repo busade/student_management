@@ -52,7 +52,7 @@ class Signup(Resource):
         new_student =Students(
             name= data.get('name'),
             email= data.get('email'),
-            password_hash = generate_password_hash(data.get('password'))
+            password_hash= generate_password_hash(data.get('password'))
 
         )
         with open ("log_details.txt", 'a' ) as user_details:
@@ -79,7 +79,7 @@ class Login (Resource):
         user = Students.query.filter_by(email= email).first()
 
 
-        if (user is not None)  and check_password_hash(Students.password_hash, pash):
+        if (user is not None)  and check_password_hash(user.password_hash, pash):
             access_token = create_access_token(identity=user.email)
             refresh_token = create_refresh_token(identity = user.email)
 

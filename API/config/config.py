@@ -7,9 +7,9 @@ from datetime import timedelta
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
-# uri = os.environ.get('DATABASE_URL')
-# if uri and uri.startswith('postgres://'):
-#     uri = uri.replace('postgres://', 'postgresql://', 1)
+uri = config('DATABASE_URL')
+if uri and uri.startswith('postgres://'):
+    uri = uri.replace('postgres://', 'postgresql://', 1)
 
 class Config():
     SECRET_KEY= config('SECRET_KEY','secret')
@@ -27,14 +27,14 @@ class DevConfig:
 
 class TestConfig(Config):
     pass
-# class ProdConfig(Config):
-#     SQLALCHEMY_TRACK_MODIFICATIONS = False
-#     DEBUG = config('DEBUG', False, cast=bool)
-#     SQLALCHEMY_DATABASE_URI = uri
-
+class ProdConfig(Config):
+    # SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # DEBUG = config('DEBUG', False, cast=bool)
+    # SQLALCHEMY_DATABASE_URI = uri
+    pass
 
 config_dict = {
     'dev': DevConfig,
     'test': TestConfig,
-    # 'prod': ProdConfig
+    'prod': ProdConfig
 }

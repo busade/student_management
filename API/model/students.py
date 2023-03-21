@@ -9,9 +9,9 @@ class Students(db.Model):
     id = db.Column(db. Integer, primary_key=True)
     name = db.Column(db.String(40), nullable = False)
     email = db.Column(db.String(40), unique = True, nullable = False)
-    password_hash = db.Column(db.String(40), nullable = False)
+    password_hash = db.Column(db.Text, nullable = False)
     courses = db.relationship('Course',backref="students",lazy = True,secondary='forms')
-    student = db.relationship('Students', backref='score', lazy = True, secondary= 'score')
+    student = db.relationship('Students', backref='scores', lazy = True, secondary= 'scores')
     
     __mapper_args__ ={
         'polymorphic_identity':'students',
@@ -70,7 +70,7 @@ class Form(db.Model):
 
 
 class Score(db.Model):
-    __tablename__ = 'score'
+    __tablename__ = 'scores'
     id = db.Column(db.Integer, primary_key=True)
     form_id = db.Column(db.Integer, db.ForeignKey('forms.id'), nullable=False)
     form = db.relationship('Form', backref='score')
@@ -79,7 +79,7 @@ class Score(db.Model):
     
 
     course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
-    course = db.relationship('Course', backref='score',  lazy = True)
+    course = db.relationship('Course', backref='scores',  lazy = True)
     score = db.Column(db.Integer, nullable=False)
     
     
@@ -89,12 +89,13 @@ class Score(db.Model):
 
     
 
-    def __repr__(self):
+    def __str__(self):
         return f"<Score{self.id}>"
     
     @classmethod
     def get_by_id(cls, id):
         return cls.query.get_or_404(id)
+    
     
     def save(self):
         db.session.add(self)

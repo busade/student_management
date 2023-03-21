@@ -146,7 +146,7 @@ class Course_Register(Resource):
         if course_check:
             student_check = Students.get_by_id(id=student_id)
             if student_check :
-                data_check = Form.query.filter_by(course_id=new_course.course_id,student_id=new_course.student_id)
+                data_check = Form.query.filter_by(course_id=course_id,student_id=student_id).first()
                 if data_check:
                     return{'message': 'course already registered'}, HTTPStatus.CONFLICT
                 else:   
@@ -164,38 +164,31 @@ class Course_Register(Resource):
 
 
 
-@course_namespace.route('/course/<int:course_id>/student/<int:student_id>')
+@course_namespace.route('/course/<int:course_id>/students')
 class GetUpdateDelete(Resource):
     
 
     @course_namespace.marshal_list_with(course_reg)
-    def get(self, course_id,student_id):
+    def get(self, course_id):
         ''' for retrieving a student that register for a particular course'''
-        student= student_id
-        course = Form.query.filter_by(course_id = course_id,student_id=student).first()
+    
+    
+        course = Form.query.filter_by(course_id = course_id).all()
 
         return course, HTTPStatus.OK
     
 
-    def delete(self, course_id, student_id):
-        student =Form.query.filter_by(student_id=student_id)
-        student_to_delete = Form.query.filter_by(course_id= course_id).filter_by(student_id= student_id).first()
-        if student_to_delete :
-            student_to_delete.delete()
-            return{'message': "student removed successfully"}, HTTPStatus.ACCEPTED
-    
-        return {'message': 'Student not found'}, HTTPStatus.CONFLICT
-    
 
 
-@course_namespace.route('course/<int:course_id>/student/<int:student_id>')
+
+@course_namespace.route('/course/<int:course_id>/student/<int:student_id>')
 class Get_edit_delete(Resource):
 
     @course_namespace.marshal_with(course_reg)
-    @jwt_required()
+    # @jwt_required()
     def get (self, student_id, course_id):
         '''retrieve a student that registered for a course by id'''
-        course = Form.query.filter_by(course_id =course_id, student_id=student_id)
+        course = Form.query.filter_by(course_id =course_id, student_id=student_id).first()
         return course, HTTPStatus.OK
 
     @jwt_required
@@ -256,6 +249,7 @@ class AddGradeToCourse(Resource):
 
          db.session.commit()
          return {'message': 'score updated'}, HTTPStatus.ACCEPTED
+
 
 
 
